@@ -170,6 +170,7 @@ struct cache_set {
 	u_int16_t		dirty_fallow;
 	unsigned long 		fallow_tstamp;
 	unsigned long 		fallow_next_cleaning;
+	unsigned long		half_life_time;
 	/*
 	 * 2 LRU queues/cache set.
 	 * 1) A block is faulted into the MRU end of the warm list from disk.
@@ -484,6 +485,8 @@ struct cacheblock {
 	u_int8_t        lru_state;
 	sector_t 	dbn;	/* Sector number of the cached block */
 	u_int16_t	hash_prev, hash_next;
+	u_int8_t 	dirty;
+	u_int8_t	reclaim_cost;
 #ifdef FLASHCACHE_DO_CHECKSUMS
 	u_int64_t 	checksum;
 #endif
