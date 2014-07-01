@@ -548,7 +548,7 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 {
         int i;
         int set = index / dmc->assoc;
-	
+        printk("hello.word-this is the kernel speaking\n");
 	
 	int second_block;
 	int first_block;
