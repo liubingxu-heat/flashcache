@@ -60,7 +60,7 @@ static void flashcache_reclaim_remove_block_from_list(struct cache_c *dmc, int i
 static void flashcache_reclaim_add_block_to_list_mru(struct cache_c *dmc, int index);
 static void flashcache_reclaim_add_block_to_list_lru(struct cache_c *dmc, int index);
 static int flashcache_reclaim_demote_block(struct cache_c *dmc, int index);
-static void flashcach_sort_lru_by_cnt(struct cache_c *dmc, int index);
+static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index);
 /* Get least recently used FIFO block */
 void
 flashcache_reclaim_fifo_get_old_block(struct cache_c *dmc, int start_index, int *index)
@@ -542,7 +542,7 @@ flashcache_lru_accessed(struct cache_c *dmc, int index)
 			/* Could not promote block, move it to mru on warm list */
 			flashcache_reclaim_move_to_mru(dmc, index);
 	}
-                    flashcach_sort_lru_by_cnt(dmc, index);
+                    flashcache_sort_lru_by_cnt(dmc, index);
 }
 static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 {
