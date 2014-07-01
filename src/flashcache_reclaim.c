@@ -548,14 +548,14 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 {
         int i;
         int set = index / dmc->assoc;
-	int hot_block;
-	int warm_block;
+	
+	
 	int second_block;
 	int first_block;
 	int third_block;
 	int forth_block;
 	int start_index = set * dmc->assoc;
-	int my_index = index - start_index;
+
 	struct cacheblock *cacheblk = &dmc->cache[index];
 
 	struct cache_set *cache_set = &dmc->cache_sets[set];
@@ -564,7 +564,7 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 	/* Both should not be set */
 	VERIFY((cacheblk->lru_state & (LRU_WARM | LRU_HOT)) != (LRU_HOT | LRU_WARM));
 	/*sort hot list first*/
-	second_block	=start_index+cache_set.hotlist_lru_head;
+	second_block	=start_index+cache_set->hotlist_lru_head;
 	//warm_block=start_index+cache_set.warmlist_lru_head;
 	for(i=0;i<cache_set->lru_hot_blocks;i++){  
             third_block=dmc->cache[second_block].lru_next;
@@ -594,8 +594,8 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
              else
                      second_block=third_block;
 		}
-	  second_block=start_index+cache_set.warmlist_lru_head;		 
-         for(i=o;i<cache_set.lru_warm_blocks,i++){  
+	  second_block=start_index+cache_set->warmlist_lru_head;		 
+         for(i=0;i<cache_set->lru_warm_blocks;i++){  
             third_block=dmc->cache[second_block].lru_next;
             if(dmc->cache[second_block].use_cnt>dmc->cache[third_block].use_cnt){
             		if(dmc->cache[second_block].lru_prev==FLASHCACHE_NULL){
