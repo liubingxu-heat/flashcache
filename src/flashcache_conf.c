@@ -1154,7 +1154,7 @@ init:
 	dmc->sysctl_pid_do_expiry = 0;
 	dmc->sysctl_max_pids = MAX_PIDS;
 	dmc->sysctl_pid_expiry_secs = PID_EXPIRY_SECS;
-	dmc->sysctl_reclaim_policy = FLASHCACHE_FIFO;
+	dmc->sysctl_reclaim_policy = FLASHCACHE_LRU;
 	dmc->sysctl_zerostats = 0;
 	dmc->sysctl_error_inject = 0;
 	dmc->sysctl_fast_remove = 0;
