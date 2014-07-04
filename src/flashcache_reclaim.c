@@ -514,7 +514,7 @@ void
 flashcache_lru_accessed(struct cache_c *dmc, int index)
 {
 	struct cacheblock *cacheblk = &dmc->cache[index];
-
+        printk("hello.lru accessed\n");
 	if (cacheblk->lru_state & LRU_HOT)
 		flashcache_reclaim_move_to_mru(dmc, index);
 	else {
@@ -548,7 +548,7 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 {
         int i;
         int set = index / dmc->assoc;
-        printk("hello.word-this is the kernel speaking\n");
+        printk("bing accessed\n");
 	
 	int second_block;
 	int first_block;
