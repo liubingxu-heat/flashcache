@@ -570,7 +570,7 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 	//warm_block=start_index+cache_set.warmlist_lru_head;
 
      /*if the cache_set is to reduce the use_cnt*/
-	if(time_after(jiffes,cache_set.half_life_time)&&((cache_set.lru_hot_blocks+cache_set.lru_warm_blocks)>0)
+	if(time_after(jiffes,cache_set.half_life_time+(3*HZ))&&((cache_set.lru_hot_blocks+cache_set.lru_warm_blocks)>0)
       	{
            p_half_life=second_block;
           
