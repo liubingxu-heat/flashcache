@@ -1088,6 +1088,7 @@ init:
 		dmc->cache_sets[i].set_clean_next = i * dmc->assoc;
 		dmc->cache_sets[i].fallow_tstamp = jiffies;
 		dmc->cache_sets[i].fallow_next_cleaning = jiffies;
+		dmc->cache_sets[i].half_life_time=jiffies;
 		dmc->cache_sets[i].hotlist_lru_tail = FLASHCACHE_NULL;
 		dmc->cache_sets[i].hotlist_lru_head = FLASHCACHE_NULL;
 		dmc->cache_sets[i].warmlist_lru_tail = FLASHCACHE_NULL;
