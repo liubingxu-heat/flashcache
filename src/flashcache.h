@@ -485,8 +485,7 @@ struct cacheblock {
 	u_int8_t        lru_state;
 	sector_t 	dbn;	/* Sector number of the cached block */
 	u_int16_t	hash_prev, hash_next;
-	u_int8_t 	dirty;
-	u_int8_t	reclaim_cost;
+	u_int8_t	access_priority;
 #ifdef FLASHCACHE_DO_CHECKSUMS
 	u_int64_t 	checksum;
 #endif
