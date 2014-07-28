@@ -546,16 +546,18 @@ flashcache_lru_accessed(struct cache_c *dmc, int index)
 }
 static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 {
-        int i;
-        int set = index / dmc->assoc;
-        printk("bing accessed\n");
-	
+        {
+       int i;
+       int set = index / dmc->assoc;
+	int hot_block;
+	int warm_block;
 	int second_block;
 	int first_block;
 	int third_block;
 	int forth_block;
 	int start_index = set * dmc->assoc;
-
+	int my_index = index - start_index;
+       int p_half_life;
 	struct cacheblock *cacheblk = &dmc->cache[index];
 
 	struct cache_set *cache_set = &dmc->cache_sets[set];
@@ -566,12 +568,53 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 	/*sort hot list first*/
 	second_block	=start_index+cache_set->hotlist_lru_head;
 	//warm_block=start_index+cache_set.warmlist_lru_head;
-	for(i=0;i<cache_set->lru_hot_blocks;i++){  
+
+     /*if the cache_set is to reduce the use_cnt*/
+	if(time_after(jiffes,cache_set.half_life_time)&&((cache_set.lru_hot_blocks+cache_set.lru_warm_blocks)>0)
+      	{
+           p_half_life=second_block;
+          
+           while(dmc->cache[p_half_life].lru_next!=NULL)/*this block isn't the tail*/
+           {
+   		dmc->cache[p_half_life].use_cnt%=2;
+	  	p_half_life=dmc->cache[p_half_life].lru_next;
+	    }
+	    dmc->cache[p_half_life].use_cnt%=2;
+		
+           dmc->cache_sets[set].half_life_time=jiffes;
+	  }
+
+	/*recalculate the access priority of every blk*/
+	if((cache_set.lru_hot_blocks+cache_set.lru_warm_blocks)>0)   
+
+	{
+		 p_half_life=second_block;
+
+		  while(dmc->cache[p_half_life].lru_next!=NULL)
+	       {	 
+
+		if (dmc->cache[p_half_life].cache_state & DIRTY)	
+		 	dmc->cache[p_half_life].access_priority=8*dmc->cache[p_half_life].use_cnt;
+		 else
+		      dmc->cache[p_half_life].access_priority=dmc->cache[p_half_life].use_cnt;
+
+			p_half_life=dmc->cache[p_half_life].lru_next;
+             }	
+
+		if (dmc->cache[p_half_life].cache_state & DIRTY)	
+		 	dmc->cache[p_half_life].access_priority=8*dmc->cache[p_half_life].use_cnt;
+		 else
+		      dmc->cache[p_half_life].access_priority=dmc->cache[p_half_life].use_cnt;
+
+	
+	 }
+	
+	for(i=o;i<cache_set.lru_hot_blocks,i++){  
             third_block=dmc->cache[second_block].lru_next;
-            if(dmc->cache[second_block].use_cnt>dmc->cache[third_block].use_cnt){
+            if(dmc->cache[second_block].access_priority>dmc->cache[third_block].access_priority){
             		if(dmc->cache[second_block].lru_prev==FLASHCACHE_NULL){
 			   dmc->cache[third_block].lru_prev=FLASHCACHE_NULL;
-			   cache_set->hotlist_lru_head=third_block-start_index;
+			   dmc->cache_set.hotlist_lru_head=third_block-start_index;
             		}
 			else{
                       first_block=dmc->cache[second_block].lru_prev;
@@ -580,7 +623,7 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 			 dmc->cache[second_block].lru_prev=third_block;
 			 if(dmc->cache[third_block].lru_next==FLASHCACHE_NULL){
                              dmc->cache[second_block].lru_next=FLASHCACHE_NULL;
-				 cache_set->hotlist_lru_tail=second_block-start_index;
+				 dmc->cache_set->hotlist_lru_tail=second_block-start_index;
 			        }
                       else{
 				  forth_block=dmc->cache[third_block].lru_next;
@@ -594,13 +637,13 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
              else
                      second_block=third_block;
 		}
-	  second_block=start_index+cache_set->warmlist_lru_head;		 
-         for(i=0;i<cache_set->lru_warm_blocks;i++){  
+	 /* second_block=start_index+cache_set.warmlist_lru_head;		 
+         for(i=o;i<cache_set.lru_warm_blocks,i++){  
             third_block=dmc->cache[second_block].lru_next;
             if(dmc->cache[second_block].use_cnt>dmc->cache[third_block].use_cnt){
             		if(dmc->cache[second_block].lru_prev==FLASHCACHE_NULL){
 			   dmc->cache[third_block].lru_prev=FLASHCACHE_NULL;
-			   cache_set->warmlist_lru_head=third_block-start_index;
+			   cache_set.warmlist_lru_head=third_block-start_index;
             		}
 			else{
                       	first_block=dmc->cache[second_block].lru_prev;
@@ -609,7 +652,7 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 				dmc->cache[second_block].lru_prev=third_block;
 				if(dmc->cache[third_block].lru_next==FLASHCACHE_NULL){
                          	   dmc->cache[second_block].lru_next=FLASHCACHE_NULL;
-				   cache_set->warmlist_lru_tail=second_block-start_index;
+				   cache_set.warmlist_lru_tail=second_block-start_index;
 			 	  }
                   	       else{
 				   forth_block=dmc->cache[third_block].lru_next;
@@ -621,5 +664,8 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
             	}
              else
                      second_block=third_block;
-		}
+		}*/
+ }
+			
+
  }
