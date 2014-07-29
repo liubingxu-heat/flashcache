@@ -573,7 +573,7 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index){
           
            while(dmc->cache[p_half_life].lru_next!=FLASHCACHE_NULL){
    	         dmc->cache[p_half_life].use_cnt%=2;
-	  	 p_half_life=dmc->cache[p_half_life].lru_next；}
+	  	 p_half_life=dmc->cache[p_half_life].lru_next;}
 	   
 	   dmc->cache[p_half_life].use_cnt%=2;
            dmc->cache_sets[set].half_life_time=jiffies;
