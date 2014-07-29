@@ -544,20 +544,17 @@ flashcache_lru_accessed(struct cache_c *dmc, int index)
 	}
                     flashcache_sort_lru_by_cnt(dmc, index);
 }
-static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
-{
-        {
-       int i;
-       int set = index / dmc->assoc;
-	int hot_block;
-	int warm_block;
+
+static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index){
+        
+        int i;
+        int set = index / dmc->assoc;
 	int second_block;
 	int first_block;
 	int third_block;
 	int forth_block;
 	int start_index = set * dmc->assoc;
-	int my_index = index - start_index;
-       int p_half_life;
+        int p_half_life;
 	struct cacheblock *cacheblk = &dmc->cache[index];
 
 	struct cache_set *cache_set = &dmc->cache_sets[set];
@@ -570,102 +567,68 @@ static void flashcache_sort_lru_by_cnt(struct cache_c *dmc, int index)
 	//warm_block=start_index+cache_set.warmlist_lru_head;
 
      /*if the cache_set is to reduce the use_cnt*/
-	if(time_after(jiffes,cache_set.half_life_time+(3*HZ))&&((cache_set.lru_hot_blocks+cache_set.lru_warm_blocks)>0)
-      	{
+	if(time_after(jiffies,cache_set->half_life_time+(3*HZ))&&((cache_set->lru_hot_blocks+cache_set->lru_warm_blocks)>0)){
+          
            p_half_life=second_block;
           
-           while(dmc->cache[p_half_life].lru_next!=NULL)/*this block isn't the tail*/
-           {
-   		dmc->cache[p_half_life].use_cnt%=2;
-	  	p_half_life=dmc->cache[p_half_life].lru_next;
-	    }
-	    dmc->cache[p_half_life].use_cnt%=2;
-		
-           dmc->cache_sets[set].half_life_time=jiffes;
-	  }
+           while(dmc->cache[p_half_life].lru_next!=FLASHCACHE_NULL){
+   	         dmc->cache[p_half_life].use_cnt%=2;
+	  	 p_half_life=dmc->cache[p_half_life].lru_next；}
+	   
+	   dmc->cache[p_half_life].use_cnt%=2;
+           dmc->cache_sets[set].half_life_time=jiffies;
+	  
 
 	/*recalculate the access priority of every blk*/
-	if((cache_set.lru_hot_blocks+cache_set.lru_warm_blocks)>0)   
+ 	   if((cache_set->lru_hot_blocks+cache_set->lru_warm_blocks)>0){
+	 
+	       p_half_life=second_block;
 
-	{
-		 p_half_life=second_block;
-
-		  while(dmc->cache[p_half_life].lru_next!=NULL)
-	       {	 
-
-		if (dmc->cache[p_half_life].cache_state & DIRTY)	
+	       while(dmc->cache[p_half_life].lru_next!=FLASHCACHE_NULL){
+	      
+		    if (dmc->cache[p_half_life].cache_state & DIRTY)	
 		 	dmc->cache[p_half_life].access_priority=8*dmc->cache[p_half_life].use_cnt;
-		 else
-		      dmc->cache[p_half_life].access_priority=dmc->cache[p_half_life].use_cnt;
+		    else
+	 	        dmc->cache[p_half_life].access_priority=dmc->cache[p_half_life].use_cnt;
 
-			p_half_life=dmc->cache[p_half_life].lru_next;
-             }	
-
-		if (dmc->cache[p_half_life].cache_state & DIRTY)	
-		 	dmc->cache[p_half_life].access_priority=8*dmc->cache[p_half_life].use_cnt;
-		 else
-		      dmc->cache[p_half_life].access_priority=dmc->cache[p_half_life].use_cnt;
-
-	
-	 }
-	
-	for(i=o;i<cache_set.lru_hot_blocks,i++){  
-            third_block=dmc->cache[second_block].lru_next;
-            if(dmc->cache[second_block].access_priority>dmc->cache[third_block].access_priority){
-            		if(dmc->cache[second_block].lru_prev==FLASHCACHE_NULL){
-			   dmc->cache[third_block].lru_prev=FLASHCACHE_NULL;
-			   dmc->cache_set.hotlist_lru_head=third_block-start_index;
-            		}
-			else{
-                      first_block=dmc->cache[second_block].lru_prev;
-			 dmc->cache[first_block].lru_next=third_block;
-	 		 dmc->cache[third_block].lru_prev=first_block;
-			 dmc->cache[second_block].lru_prev=third_block;
-			 if(dmc->cache[third_block].lru_next==FLASHCACHE_NULL){
-                             dmc->cache[second_block].lru_next=FLASHCACHE_NULL;
-				 dmc->cache_set->hotlist_lru_tail=second_block-start_index;
-			        }
-                      else{
-				  forth_block=dmc->cache[third_block].lru_next;
-				  dmc->cache[second_block].lru_next=forth_block;
-				  dmc->cache[forth_block].lru_prev=second_block;
-			        }
-			}
+		    p_half_life=dmc->cache[p_half_life].lru_next;}
+              	
+	       if (dmc->cache[p_half_life].cache_state & DIRTY)	
+ 		   dmc->cache[p_half_life].access_priority=8*dmc->cache[p_half_life].use_cnt;
+     	       else
+		   dmc->cache[p_half_life].access_priority=dmc->cache[p_half_life].use_cnt;}
+       /*sort by the accesee priority*/
+           for(i=0;cache_set->lru_hot_blocks;i++){  
+            
+               third_block=dmc->cache[second_block].lru_next;
+            
+               if(dmc->cache[second_block].access_priority>dmc->cache[third_block].access_priority){
+            		
+            	  if(dmc->cache[second_block].lru_prev==FLASHCACHE_NULL){
+		     dmc->cache[third_block].lru_prev=FLASHCACHE_NULL;
+	             dmc->cache_sets[set].hotlist_lru_head=third_block-start_index;}
+	          else{
+                     first_block=dmc->cache[second_block].lru_prev;
+	             dmc->cache[first_block].lru_next=third_block;
+	             dmc->cache[third_block].lru_prev=first_block;
+		     dmc->cache[second_block].lru_prev=third_block;
+			   
+	             if(dmc->cache[third_block].lru_next==FLASHCACHE_NULL){
+                        dmc->cache[second_block].lru_next=FLASHCACHE_NULL;
+			dmc->cache_sets[set].hotlist_lru_tail=second_block-start_index;}
+                     else{
+			  forth_block=dmc->cache[third_block].lru_next;
+		          dmc->cache[second_block].lru_next=forth_block;
+	                  dmc->cache[forth_block].lru_prev=second_block;}
+			      
+		       }
 
             	}
 
              else
                      second_block=third_block;
 		}
-	 /* second_block=start_index+cache_set.warmlist_lru_head;		 
-         for(i=o;i<cache_set.lru_warm_blocks,i++){  
-            third_block=dmc->cache[second_block].lru_next;
-            if(dmc->cache[second_block].use_cnt>dmc->cache[third_block].use_cnt){
-            		if(dmc->cache[second_block].lru_prev==FLASHCACHE_NULL){
-			   dmc->cache[third_block].lru_prev=FLASHCACHE_NULL;
-			   cache_set.warmlist_lru_head=third_block-start_index;
-            		}
-			else{
-                      	first_block=dmc->cache[second_block].lru_prev;
-				dmc->cache[first_block].lru_next=third_block;
-	 			dmc->cache[third_block].lru_prev=first_block;
-				dmc->cache[second_block].lru_prev=third_block;
-				if(dmc->cache[third_block].lru_next==FLASHCACHE_NULL){
-                         	   dmc->cache[second_block].lru_next=FLASHCACHE_NULL;
-				   cache_set.warmlist_lru_tail=second_block-start_index;
-			 	  }
-                  	       else{
-				   forth_block=dmc->cache[third_block].lru_next;
-				   dmc->cache[second_block].lru_next=forth_block;
-				   dmc->cache[forth_block].lru_prev=second_block;
-			        }
-			}
 
-            	}
-             else
-                     second_block=third_block;
-		}*/
+   }
  }
-			
-
- }
+		
